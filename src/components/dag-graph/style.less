@@ -1,0 +1,227 @@
+@card-width:280px;
+@card-space:10px;
+@card-item-height:28px;
+@dag-ant-block-height:26px;
+@dag-ant-block-gap:3px;
+@dag-graph-context-menu:160px;
+@icon-hover-color: red;
+@tabs-tab-bg: #fff;
+@component-background: orange;
+@icon-color-grey: '#9BA7BA';
+@border-color-base: '#000';
+@font-color-base: '#9BA7BA';
+@grey-color5: red;
+@primary-color: red;
+
+#dagGraphMountNode {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: @tabs-tab-bg;
+  .ant-menu-vertical {
+    border: none;
+  }
+}
+
+.dag-graph {
+  &-detail-card {
+    width: @card-width;
+    padding: @card-space;
+    background-color: @component-background !important;
+    position: absolute;
+    bottom: @card-space*2;
+    right: @card-space*2;
+    p {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+  &-detail-card-item {
+    height: @card-item-height;
+    line-height: @card-item-height;
+  }
+  &-detail-card-btn {
+    margin-top: @card-space;
+  }
+  &-plugins-context-menu {
+    position: absolute;
+    width: @dag-graph-context-menu;
+    .ant-menu-item,
+    .ant-menu-title-content,
+    .ant-menu-submenu-title {
+      height: 26px !important;
+      line-height: 26px !important;
+    }
+     .ant-menu-item {
+      margin-bottom: 4px !important;
+    }
+    .ant-menu-title-content {
+      display: block;
+      span {
+        display: block;
+      }
+    }
+  }
+  &-plugins-instance-quality-list,
+  &-plugins-task-quality-list {
+    position: absolute;
+    padding: 8px 16px;
+    color: @icon-color-grey;
+    background: @component-background;
+    box-shadow: 0px 4px 8px rgba(13, 18, 36, 0.05);
+    border-radius: 4px;
+    .ant-row {
+      width: 320px;
+      line-height: 24px;
+    }
+  }
+   &-plugins-instance-quality-list {
+    .ant-row {
+      width: 350px;
+    }
+   }
+  &-toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    background-color: var(--md-common-tabs-tab-bg);
+    border-bottom: 1px solid #EBF0F5;
+    user-select: none;
+    .tools-wrap {
+      display: flex;
+      justify-content: space-between;
+      &-not-goback {
+        justify-content: right;
+      }
+      .title {
+        margin-left: 17px;
+        color: @icon-hover-color;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+        .anticon { 
+          margin-right: 8px;
+        }
+      }
+      &_right {
+        display: flex;
+        .uxcfont {
+          font-size: 12px;
+          vertical-align: middle;
+        }
+        li:not(.diagram-type) {
+          width: 30px;
+          height: 42px;
+          color: @icon-color-grey;
+          line-height: 40px;
+          text-align: center;
+          cursor: pointer;
+          .anticon,
+          .iconfont,
+          .uxcfont {
+            cursor: pointer;
+            font-size: 14px;
+            color: @icon-color-grey;
+            vertical-align: middle;
+          }
+          &:hover {
+            .anticon,
+            .iconfont,
+            .uxcfont {
+              color: @icon-hover-color;
+            }
+          }
+        }
+        .legend-icon {
+          .uxcfont {
+            color: @icon-hover-color !important;
+          }
+        }
+        .diagram-type {
+          margin-top: 10px;
+          width: 120px !important;
+          height: 22px !important;
+          line-height: 22px !important;
+          padding: 0 12px;
+          border: 1px solid @border-color-base;
+          display: flex;
+          justify-content: space-between;
+          align-items: center; 
+          color: @font-color-base;
+          cursor: pointer;
+          border-radius: 4px;
+          .anticon {
+            color: @grey-color5;
+          }
+        }
+        .disabled {
+          .iconfont {
+            cursor: not-allowed !important;
+            color: #BCCAD6 !important;
+          }
+        }
+      }
+    }
+  }
+  &-line-type-menu,
+  &-rankdir-menu,
+  &-diagram-menu,
+  &-legend-wrap {
+    position: absolute;
+    top: 32px;
+    width: 116px;
+    box-sizing: border-box;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 16px #E4E5EA;
+    border-radius: 4px;
+    .ant-menu-item {
+      margin: 0 !important;
+      &:hover {
+        span,
+        .iconfont {
+          color: @primary-color !important;
+        }
+      }
+      .ant-menu-title-content {
+        display: flex;
+        align-items: center;
+      }
+    }
+    .iconfont {
+      vertical-align: middle;
+      margin-right: 9px;
+    }
+    .ant-menu-item-selected {
+      span,
+      .iconfont {
+        color: @primary-color !important;
+      }
+    }
+  }
+  &-legend-wrap {
+    right: 4px;
+  }
+  &-diagram-menu {
+    right: 210px;
+  }
+  &-diagram-menu_add {
+    right: 240px;
+  }
+  &-rankdir-menu {
+    right: 90px;
+  }
+  &-rankdir-menu_add {
+    right: 120px;
+  }
+  &-line-type-menu {
+    right: 60px;
+  }
+  &-line-type-menu_add {
+    right: 90px;
+  }
+}

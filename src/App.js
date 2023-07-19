@@ -1,25 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
+import DagGraph from './components/dag-graph'
+import { initialData } from './data/initData'
+import './app.css'
+const App = (props) => {
+  const { graph: { getGraphDecorator } } = props || {}
+  console.log(111)
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {getGraphDecorator({
+        initialData,
+        page: 'cycle-task',
+        title: '测试test'
+      })(<DagGraph />)}
     </div>
   );
 }
 
-export default App;
+export default DagGraph.create()(App);

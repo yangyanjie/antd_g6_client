@@ -1,0 +1,17 @@
+.background-image-png(@path) {
+  background-image: url("@{path}@1x.png");
+  background-repeat: no-repeat;
+  background-size: 100%;
+  @media all and (min-resolution: 2dppx) {
+    background-image: url("@{path}@2x.png");
+  }
+}
+
+.background-image-gif(@path) {
+  background-image: url("@{path}@1x.gif");
+  background-repeat: no-repeat;
+  background-size: 100%;
+  @media all and (min-resolution: 2dppx) {
+    background-image: url("@{path}@2x.gif");
+  }
+}
