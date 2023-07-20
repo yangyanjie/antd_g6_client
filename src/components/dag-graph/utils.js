@@ -11,13 +11,14 @@ export function executeBatch(graph, execute) {
 }
 
 export function getInitialData(initData) {
-  const { nodes = [], edges = [] } = initData || {};
+  const { nodes = [], edges = [], combos=[] } = initData || {};
   const nodeData = []; const ids=[];
   nodes.forEach(node => {
     node.id += '';
     if (!ids.includes(node.id)) {
       ids.push(node.id)
       nodeData.push(node)
+      
     }
   });
 
@@ -26,7 +27,7 @@ export function getInitialData(initData) {
     edge.target += '';
   });
 
-  return { nodes: nodeData, edges }
+  return { nodes: nodeData, edges, combos }
 
 }
 

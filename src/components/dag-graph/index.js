@@ -5,6 +5,7 @@ import './shape/edges/edge-vertical'
 import './shape/edges/edge-horizontal'
 import './shape/nodes/simple-node'
 import './shape/nodes/node'
+import './shape/combos/complex-combo'
 import './behaviour'
 
 import { isFunction } from 'lodash'
@@ -56,10 +57,10 @@ const DagGraph = (props) => {
     }
   }, [])
 
-  useEffect(()=>{
-    const resetProps = { lineType, page, rankdir, diagramType }
-    _updateData(initialData, resetProps)
-  }, [ initialData, lineType, rankdir, diagramType ])
+  // useEffect(()=>{
+  //   const resetProps = { lineType, page, rankdir, diagramType }
+  //   _updateData(initialData, resetProps)
+  // }, [ initialData, lineType, rankdir, diagramType ])
   useEffect(() => {
     defaultSelectedNode({ handleSetNodeModel, rowId: nodeModel.id })
   }, [ nodeModel, initialData ])
@@ -158,10 +159,8 @@ function init(props, ref) {
   const extraConfig=extraGraphConfig({ page, diagramType, lineType, rankdir });
   const wrapper = document.querySelector('#dagGraphMountNode')
   const { width = 700, height = 700 } = ref.current?.getBoundingClientRect();
-  console.log(extraConfig, initialData, 13)
-
-
   initData.__graph = new G6.Graph({
+    // renderer: 'svg',
     container: 'dagGraphMountNode',
     height,
     width,
@@ -173,29 +172,30 @@ function init(props, ref) {
     plugins: [ toolBar ],
     modes: {
       default: [
-        { type: 'drag-canvas', allowDragOnItem: true }, // 可拖拽
+        // { type: 'drag-canvas', allowDragOnItem: true }, // 可拖拽
         'zoom-canvas', // 可缩放
         'active-edge',
-        'click-selected'
+        'click-selected',
+        'drag-combo'
       ],
     },
     fitCenter: true,
     ...extraConfig
   })
-
+  // console.log(getInitialData(initialData), 9090)
+  
   initData.__graph.data(getInitialData(initialData || initData.data))
-  initData.__graph.render()
-  initData.center = initData.__graph.getViewPortCenterPoint()
+  initData.__graph.render();
+  // initData.center = initData.__graph.getViewPortCenterPoint()
   contextMenuEvent(initData.__graph, props)
-  onBehaviour(initData.__graph, props)
-  defaultSelectedNode(props)
+  // onBehaviour(initData.__graph, props)
+  // defaultSelectedNode(props)
 
-  resizeWraper(initData.__graph, wrapper)
+  // resizeWraper(initData.__graph, wrapper)
 }
 
 function extraGraphConfig(params) {
-  const { page, diagramType } = params
-  const { anchorPoints, _rankdir, edgeType } =nodeEdgeLayoutParams(params)
+  const { edgeType } =nodeEdgeLayoutParams(params)
 
   const defaultEdge = {
     type: edgeType,
@@ -206,37 +206,66 @@ function extraGraphConfig(params) {
       }
     },
   }
+  const defaultCombo = {
+    type: 'complexCombo',
+    anchorPoints: [
+      [0.5, 1],
+      [0.5, 0],
+    ],
+    // fixSize: [300, 50],
+    fixCollapseSize: [200, 30],
+    labelCfg: {
+      /* label's offset to the keyShape */
+      // refY: 10,
+      /* label's position, options: center, top, bottom, left, right */
+      position: 'top',
+      /* label's style */
+      style: {
+        fontSize: 14,
+      },
+    },
 
-  if(diagramType === DIAGRAM_MAP.original){
-    return {
-      layout:{
-        rankdir:_rankdir
-      },
-      defaultNode: {
-        type: SIMPLE_NODE,
-        anchorPoints,
-        page,
-      },
-      defaultEdge,
-      nodeStateStyles:NODE_STATE_STYLES,
-      edgeStateStyles:EDGE_STATE_STYLES
-    }
   }
   return {
-    layout :{
-      type: 'dagre',
-      ranksep: 30,
-      nodesep: 80,
+    layout: {
+      type: 'comboCombined',
+      sortByCombo: true,
+      onLayoutEnd: () => {      // 可选
+        console.log('combo force layout done');
+      },
+      innerLayout: new G6.Layout['grid']({
+        // width: 320,
+        // height: 160,
+        // beign: [0, 0],
+        rows: 3,// 行
+        cols: 10,// 列,列优先于行
+        // beign: [0, 0], // 网格布局开始的位置
+        preventOverlap: true, // 是否防止重叠
+        nodeSize: 30,
+        preventOverlapPadding: 0,
+        condense: true,
+        style: {
+          fill: 'red'
+        }
+  
+      }),
+      outerLayout: new G6.Layout['dagre']({
+        rankdir: 'TB',
+        begin: [50, 50],
+        nodesep: 80,
+        ranksep: 50,
+      })
     },
     nodeStateStyles:NODE_STATE_STYLES,
     defaultEdge,
+    defaultCombo,
     defaultNode: {
       type:CARD_NODE,
       anchorPoints: [
         [ 0.5, 1 ],
         [ 0.5, 0 ],
       ],
-      page,
+      page: 'process-define',
     },
   }
 }
@@ -250,6 +279,15 @@ function contextMenuEvent(graph, props) {
     const itemModel=item?.getModel() || {}
 
     onContextMenu && onContextMenu({ show: true, ...itemModel, x: canvasX, y: canvasY })
+  })
+  graph.on('combo:click', (e) => {
+    const target = e.target.get('name');
+    if (target === 'combo-collapse-expand') {// 展开折叠combo
+      graph.collapseExpandCombo(e.item);
+      if (graph.get('layout')) {
+        graph.layout()
+      } else graph.refreshPositions();
+    }
   })
 }
 
@@ -267,68 +305,68 @@ function defaultSelectedNode(props) {
   graph.setItemState(item, 'selecte', true)
 }
 
-function onBehaviour(graph, props) {
-  // eslint-disable-next-line no-shadow
-  const { fitView, clearZoom, zoomIn, zoomOut, handleSetNodeModel, onQualityData,
-    onCardState, onContextMenu, setIslegend, diagramType, setIsDiagram,
-    setIsRankdirMenu, setIsLineTypeMenu, onGetDetailData, onUpdateTopoStatus, onDetail } = props
-  graph.on('nodeClick', e => {
-    const { model = {} } = e;
-    const { total } = model;
-    if (total && diagramType !==DIAGRAM_MAP.original) {
-      onCardState('down')
-      return;
-    };
+// function onBehaviour(graph, props) {
+//   // eslint-disable-next-line no-shadow
+//   const { fitView, clearZoom, zoomIn, zoomOut, handleSetNodeModel, onQualityData,
+//     onCardState, onContextMenu, setIslegend, diagramType, setIsDiagram,
+//     setIsRankdirMenu, setIsLineTypeMenu, onGetDetailData, onUpdateTopoStatus, onDetail } = props
+//   graph.on('nodeClick', e => {
+//     const { model = {} } = e;
+//     const { total } = model;
+//     if (total && diagramType !==DIAGRAM_MAP.original) {
+//       onCardState('down')
+//       return;
+//     };
 
-    handleSetNodeModel(model)
-    onGetDetailData(model)
-    onContextMenu && onContextMenu({ show: false })
-  })
-  graph.on('canvasClick', () => {
-    onContextMenu && onContextMenu({ show: false })
-    onCardState('down')
-  })
-  graph.on('zoomBehaviour', e => {
-    const { type } = e
-    setIsDiagram(false)
-    setIslegend(false)
-    setIsRankdirMenu(false)
-    setIsLineTypeMenu(false)
+//     handleSetNodeModel(model)
+//     onGetDetailData(model)
+//     onContextMenu && onContextMenu({ show: false })
+//   })
+//   graph.on('canvasClick', () => {
+//     onContextMenu && onContextMenu({ show: false })
+//     onCardState('down')
+//   })
+//   graph.on('zoomBehaviour', e => {
+//     const { type } = e
+//     setIsDiagram(false)
+//     setIslegend(false)
+//     setIsRankdirMenu(false)
+//     setIsLineTypeMenu(false)
 
-    type == 'plus' && zoomIn();
-    type == 'minus' && zoomOut();
-    type == 'adapterView' && fitView();
-    type == 'clearZoom' && clearZoom();
-    type === 'legend' && setIslegend(prevLegend => !prevLegend);
-    type ==='clearDetail' && onDetail({ show:false })
-    type === 'diagramType' && setIsDiagram(prevLegend => !prevLegend);
-    type === 'rankdir' && diagramType !==DIAGRAM_MAP.original && setIsRankdirMenu(prevRankdir => !prevRankdir);
-    type === 'lineType' && diagramType !==DIAGRAM_MAP.original && setIsLineTypeMenu(prevRankdir => !prevRankdir);
+//     type == 'plus' && zoomIn();
+//     type == 'minus' && zoomOut();
+//     type == 'adapterView' && fitView();
+//     type == 'clearZoom' && clearZoom();
+//     type === 'legend' && setIslegend(prevLegend => !prevLegend);
+//     type ==='clearDetail' && onDetail({ show:false })
+//     type === 'diagramType' && setIsDiagram(prevLegend => !prevLegend);
+//     type === 'rankdir' && diagramType !==DIAGRAM_MAP.original && setIsRankdirMenu(prevRankdir => !prevRankdir);
+//     type === 'lineType' && diagramType !==DIAGRAM_MAP.original && setIsLineTypeMenu(prevRankdir => !prevRankdir);
 
-    if (type == 'refresh') {
-      onUpdateTopoStatus && onUpdateTopoStatus()
-      fitView()
-      clearZoom()
-    }
-  })
-  graph.on('nodeDbClick', (e) => {
-    const { model } = e;
-    const { total } = model;
-    if (total && diagramType !== DIAGRAM_MAP.original) return onCardState('down')
+//     if (type == 'refresh') {
+//       onUpdateTopoStatus && onUpdateTopoStatus()
+//       fitView()
+//       clearZoom()
+//     }
+//   })
+//   graph.on('nodeDbClick', (e) => {
+//     const { model } = e;
+//     const { total } = model;
+//     if (total && diagramType !== DIAGRAM_MAP.original) return onCardState('down')
 
-    onCardState('')
-    handleSetNodeModel(model)
-    onGetDetailData(model)
-  })
-  graph.on('operator:mouseenter', e => {
-    const { canvasX, canvasY, item } = e
-    const itemModel = item?.getModel() || {}
-    onQualityData && onQualityData({ show:true, ...itemModel, x:canvasX, y:canvasY, })
-  })
-  graph.on('operator:mouseleave', () => {
-    onQualityData && onQualityData({ show:false })
-  })
-}
+//     onCardState('')
+//     handleSetNodeModel(model)
+//     onGetDetailData(model)
+//   })
+//   graph.on('operator:mouseenter', e => {
+//     const { canvasX, canvasY, item } = e
+//     const itemModel = item?.getModel() || {}
+//     onQualityData && onQualityData({ show:true, ...itemModel, x:canvasX, y:canvasY, })
+//   })
+//   graph.on('operator:mouseleave', () => {
+//     onQualityData && onQualityData({ show:false })
+//   })
+// }
 
 // 缩放控制
 function zoom(scale) {
