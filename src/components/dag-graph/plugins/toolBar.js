@@ -55,7 +55,7 @@ const BaseContent = (props) => {
           </>
           }
           <li code="refresh" title="刷新"><i className="iconfont icon-refresh" /></li>
-          <li code="plus" title="放大"><i className="uxcfont uxcicon-plus"/></li>
+          <li code="plus" title="放大"><i className="iconfont icon-add"/></li>
           <li code="minus" title="缩小"><MinusOutlined /></li>
           <li code="adapterView" title="适配屏幕"><i className="iconfont icon-adapt-screen" /></li>
           <li code="clearZoom" title="1:1"><span className="anticon">1:1</span></li>

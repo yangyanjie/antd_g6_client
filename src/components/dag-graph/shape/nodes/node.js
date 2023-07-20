@@ -132,6 +132,7 @@ const nodeOption = {
   drawCategory(cfg, group, color) {
     const { page, categoryTitle, businessName } = cfg
     const text = TASK_ARR.includes(page) ? (businessName || '-') : (categoryTitle || '-')
+    
     group.addShape('text', {
       attrs: {
         x: 54,

@@ -158,7 +158,7 @@ function init(props, ref) {
   const extraConfig=extraGraphConfig({ page, diagramType, lineType, rankdir });
   const wrapper = document.querySelector('#dagGraphMountNode')
   const { width = 700, height = 700 } = ref.current?.getBoundingClientRect();
-  console.log(props, 13)
+  console.log(extraConfig, initialData, 13)
 
 
   initData.__graph = new G6.Graph({
@@ -190,7 +190,7 @@ function init(props, ref) {
   onBehaviour(initData.__graph, props)
   defaultSelectedNode(props)
 
-  // resizeWraper(initData.__graph, wrapper)
+  resizeWraper(initData.__graph, wrapper)
 }
 
 function extraGraphConfig(params) {

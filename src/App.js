@@ -3,13 +3,14 @@ import { initialData } from './data/initData'
 import './app.css'
 const App = (props) => {
   const { graph: { getGraphDecorator } } = props || {}
-  console.log(111)
+  console.log(initialData, 8989)
   return (
     <div className="App">
       {getGraphDecorator({
         initialData,
-        page: 'cycle-task',
-        title: '测试test'
+        // lineType: 'line',
+        page: 'process-define',
+        title: '测试test',
       })(<DagGraph />)}
     </div>
   );
