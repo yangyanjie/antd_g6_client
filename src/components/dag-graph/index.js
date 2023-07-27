@@ -13,8 +13,9 @@ import { isFunction } from 'lodash'
 import { toolBar, Legend, DiagramTypes, Rankdir, LineTypes } from './plugins'
 import {
   CARD_NODE, SIMPLE_NODE, globalStyle, LINE_MAP,
-  DIAGRAM_MAP, RANKDIR_MAP, NODE_STATE_STYLES, EDGE_STATE_STYLES } from './constant'
+  DIAGRAM_MAP, RANKDIR_MAP, NODE_STATE_STYLES } from './constant'
 import { getInitialData } from './utils';
+import { comboData } from '../../data/initData';
 
 import './style.less'
 
@@ -182,8 +183,6 @@ function init(props, ref) {
     fitCenter: true,
     ...extraConfig
   })
-  // console.log(getInitialData(initialData), 9090)
-  
   initData.__graph.data(getInitialData(initialData || initData.data))
   initData.__graph.render();
   // initData.center = initData.__graph.getViewPortCenterPoint()
@@ -212,7 +211,7 @@ function extraGraphConfig(params) {
       [0.5, 1],
       [0.5, 0],
     ],
-    // fixSize: [300, 50],
+    // fixSize: [320, 110],
     fixCollapseSize: [200, 30],
     labelCfg: {
       /* label's offset to the keyShape */
@@ -230,19 +229,18 @@ function extraGraphConfig(params) {
     layout: {
       type: 'comboCombined',
       sortByCombo: true,
-      onLayoutEnd: () => {      // 可选
+      onLayoutEnd: () => {   // 可选
         console.log('combo force layout done');
       },
       innerLayout: new G6.Layout['grid']({
-        // width: 320,
-        // height: 160,
-        // beign: [0, 0],
+        // width: 300,
+        beign: [0, 0],
         rows: 3,// 行
         cols: 10,// 列,列优先于行
         // beign: [0, 0], // 网格布局开始的位置
         preventOverlap: true, // 是否防止重叠
         nodeSize: 30,
-        preventOverlapPadding: 0,
+        preventOverlapPadding: 20,
         condense: true,
         style: {
           fill: 'red'
@@ -271,7 +269,7 @@ function extraGraphConfig(params) {
 }
 
 function contextMenuEvent(graph, props) {
-  const { onContextMenu } = props
+  const { onContextMenu, initialData } = props
 
   graph.on('node:contextmenu', evt => {
     evt.preventDefault()
@@ -281,12 +279,17 @@ function contextMenuEvent(graph, props) {
     onContextMenu && onContextMenu({ show: true, ...itemModel, x: canvasX, y: canvasY })
   })
   graph.on('combo:click', (e) => {
+    console.log(graph, 888)
     const target = e.target.get('name');
     if (target === 'combo-collapse-expand') {// 展开折叠combo
       graph.collapseExpandCombo(e.item);
       if (graph.get('layout')) {
         graph.layout()
       } else graph.refreshPositions();
+    }
+    if (target === 'combo-right-flip') {// 翻页
+      Object.assign(initialData, {combos: [ comboData ]});
+      graph.changeData(getInitialData(initialData));
     }
   })
 }

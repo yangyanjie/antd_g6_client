@@ -19,3 +19,15 @@ const App = (props) => {
 }
 
 export default DagGraph.create()(App);
+
+// import Visial from './components/visial'
+
+// const App = () => {
+//   return (
+//     <div className="app">
+//       <Visial />
+//     </div>
+//   )
+// }
+
+// export default App;

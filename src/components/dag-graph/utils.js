@@ -12,7 +12,7 @@ export function executeBatch(graph, execute) {
 
 export function getInitialData(initData) {
   const { nodes = [], edges = [], combos=[] } = initData || {};
-  const nodeData = []; const ids=[];
+  let nodeData = []; const ids=[];
   nodes.forEach(node => {
     node.id += '';
     if (!ids.includes(node.id)) {
@@ -21,6 +21,10 @@ export function getInitialData(initData) {
       
     }
   });
+  combos.forEach(combo => {
+    const {data} = combo;
+    nodeData = [...nodeData, ...data];
+  })
 
   edges.forEach(edge => {
     edge.source += '';

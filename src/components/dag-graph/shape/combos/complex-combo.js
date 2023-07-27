@@ -41,24 +41,11 @@ G6.registerCombo(
       const padding = cfg.padding || [0, 0, 0, 0];
       const l = getBytesLength(page);
       const w = l * 6;
-      // 画外部的包容容器；
-      group.addShape('rect', {
-        attrs: {
-          x: -160,
-          y: -65,
-          width: 320,
-          height: 110,
-          fill: 'red',
-          stroke: '',
-          radius: [10,10]
-        },
-        name: 'complex-rect'
-      })
       // 增加右翻
       group.addShape('text', {
         attrs: {
           x: 150-padding[1],
-          y: -30-padding[0] + 10,
+          y: -30-padding[0],
           text: '\ue69e',
           fontFamily: 'iconfont',
           fontSize: 10,
@@ -74,7 +61,7 @@ G6.registerCombo(
       group.addShape('text', {
         attrs: {
           x: 150-padding[1]-w-2,
-          y: -30-padding[0] + 10,
+          y: -30-padding[0],
           width: w,
           text: page,
           textAlign: 'left',
@@ -89,7 +76,7 @@ G6.registerCombo(
       group.addShape('text', {
         attrs: {
           x: 150-padding[1]-w - 16,
-          y: -30-padding[0] + 10,
+          y: -30-padding[0],
           text: '\ue6d0',
           fontFamily: 'iconfont',
           fontSize: 10,
@@ -105,7 +92,7 @@ G6.registerCombo(
       group.addShape('text', {
         attrs: {
           x: 150-padding[1]-w - 28,
-          y: -30-padding[0] + 12,
+          y: -30-padding[0]+2,
           text: '\ue636',
           fontFamily: 'iconfont',
           fontSize: 9,
@@ -121,7 +108,7 @@ G6.registerCombo(
       group.addShape('text', {
         attrs: {
           x: 150-padding[1]-w -28,
-          y: -30-padding[0] + 12,
+          y: -30-padding[0],
           width: 12,
           height: 12,
           text: '\ue61e',
@@ -177,8 +164,6 @@ G6.registerCombo(
       const l = getBytesLength(page);
       const w = l * 6;
       const group = combo.get('group');
-      const comboKeyShape = group.find((ele) => ele.get('name') === 'combo-keyShape');
-      console.log(comboKeyShape.getBBox(), 1234)
       const comboCollapseExpand = group.find((ele) => ele.get('name') === 'combo-collapse-expand'); // // 修改展开折叠按钮
       const position = cfg.collapsed ? 
       { 
@@ -187,25 +172,13 @@ G6.registerCombo(
       } 
       : { 
         x: 150-padding[1]-w -40,
-        y: -30-padding[0] + 12, 
+        y: -30-padding[0] + 2, 
       }
       comboCollapseExpand.attr({
         ...position,
         text: cfg.collapsed ? '\ue61f': '\ue61e',
         textBaseline: 'top',
       })
-      const wAndh = cfg.collapsed? {
-        width: 220,
-        height: 90
-      }: {
-        width: 320,
-        height:110
-      }
-
-      comboKeyShape.attr({
-        ...wAndh
-      })
-      console.log(wAndh, comboKeyShape, 99)
 
     },
     changeToolBar(cfg, combo) {
@@ -220,7 +193,7 @@ G6.registerCombo(
     changeShapeVisible(combo, name, collapsed) {
       const group = combo.get('group');
       const shape = group.find((ele) => ele.get('name') === name);
-      shape.set('visible', !collapsed)
+      shape.set('visible', !collapsed);
     },
     changeSimpleCombo(cfg, combo) {
       const { collapsed } = cfg;
@@ -252,6 +225,9 @@ G6.registerCombo(
     },
     // 定义新增的右侧圆的位置更新逻辑
     afterUpdate: function afterUpdate(cfg, combo) {
+      const group = combo.get('group');
+      const sort = group.find((ele) => ele.get('name') === 'combo-sort');
+      console.log(sort, 999)
       this.changeComboCollapseexpand(cfg, combo);
       this.changeToolBar(cfg, combo);
       this.changeSimpleCombo(cfg, combo);
